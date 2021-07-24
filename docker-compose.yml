@@ -1,0 +1,40 @@
+version: '3.7'
+services:
+  bts-ui:
+    container_name: bts-ui
+    build:
+      context: ./packages/client
+      dockerfile: Dockerfile
+      target: production
+    environment:
+      - NODE_ENV=production
+    ports:
+      - "8080:8080"
+      - "8081:80"
+    depends_on:
+      - bts-api
+    networks:
+      - nest-mevn-network
+
+  bts-api:
+    container_name: bts-api
+    restart: on-failure
+    build:
+      context: ./packages/server
+      dockerfile: Dockerfile
+      target: production
+    environment:
+      - NODE_ENV=production
+      - DOCKER_ENV=production
+      - DOCKER_DB_URL=mongodb+srv://huy:huy123@bts-0.sgs4h.mongodb.net/bts?retryWrites=true&w=majority
+      - DOCKER_DB_NAME=
+    env_file:
+      - ./packages/server/.env
+    ports:
+      - "3000:3000"
+    networks:
+      - nest-mevn-network
+
+networks:
+  nest-mevn-network:
+    driver: bridge

@@ -1,0 +1,4 @@
+export enum ROLE {
+  OWNER = 'OWNER',
+  COLLABORATOR = 'COLLABORATOR',
+}

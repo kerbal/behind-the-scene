@@ -1,0 +1,4 @@
+export enum PROJECT_STATUS {
+  NORMAL = 'NORMAL',
+  DELETED = 'DELETED',
+}

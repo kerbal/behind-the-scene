@@ -1,0 +1,56 @@
+version: '3.7'
+services:
+  bts-ui:
+    build:
+      target: development
+    environment:
+      - NODE_ENV=development
+    volumes: 
+      - ./packages/client:/app
+      - /app/node_modules
+
+  bts-api:
+    build:
+      target: development
+    environment:
+      - NODE_ENV=development
+      - DOCKER_ENV=development
+      - DOCKER_DB_URL=mongodb://bts-mongodb:27017/bts-dev?replicaSet=rs0
+      - DOCKER_DB_NAME=bts-dev
+    volumes: 
+      - ./packages/server:/app
+      - /app/node_modules
+    depends_on:
+      - bts-mongodb-setup
+
+  bts-mongodb-setup:
+    container_name: bts-mongodb-setup
+    image: mongo:latest
+    restart: on-failure
+    networks:
+      - nest-mevn-network
+    volumes:
+      - ./scripts:/scripts
+    entrypoint: ["sh","/scripts/bts-mongodb-setup.sh"]
+    depends_on:
+      - bts-mongodb
+
+  bts-mongodb:
+    container_name: bts-mongodb
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+      # - "27017-27019:27017-27019"
+    networks:
+      - nest-mevn-network
+    volumes: 
+      - ./mongo-volume:/data/db/
+    command: "--bind_ip_all --replSet rs0"
+    restart: always 
+    # environment:
+    #   - MONGO_INITDB_ROOT_USERNAME=admin
+    #   - MONGO_INITDB_ROOT_PASSWORD=admin
+    #   - MONGO_INITDB_DATABASE=bts-dev
+
+volumes:
+  mongo-volume:
